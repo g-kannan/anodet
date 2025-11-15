@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+theme=gr.themes.Ocean()
+
 def list_compute_resources(host_url, token):
     try:
         # Use .env values if inputs are empty
@@ -87,7 +89,7 @@ def list_compute_resources(host_url, token):
         error = [[str(e), ""]]
         return error, error, json.dumps({"error": str(e)}, indent=2)
 
-with gr.Blocks(theme=gr.themes.Ocean()) as demo:
+with gr.Blocks() as demo:
     gr.Markdown("# Databricks Compute Resources Viewer")
     gr.Markdown("View all clusters and SQL warehouses in your Databricks workspace")
     gr.Markdown("💡 **Tip:** Leave fields empty to use values from `.env` file")
