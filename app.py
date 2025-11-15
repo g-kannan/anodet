@@ -1,11 +1,20 @@
 import gradio as gr
 from databricks.sdk import WorkspaceClient
 import json
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 def list_compute_resources(host_url, token):
     try:
+        # Use .env values if inputs are empty
+        host_url = host_url or os.getenv("url", "")
+        token = token or os.getenv("token", "")
+        
         if not host_url or not token:
-            return json.dumps({"error": "Please provide both host URL and token"}, indent=2)
+            return json.dumps({"error": "Please provide both host URL and token (via input or .env file)"}, indent=2)
         
         w = WorkspaceClient(host=host_url, token=token)
         
@@ -53,16 +62,19 @@ def list_compute_resources(host_url, token):
 with gr.Blocks() as demo:
     gr.Markdown("# Databricks Compute Resources Viewer")
     gr.Markdown("View all clusters and SQL warehouses in your Databricks workspace")
+    gr.Markdown("💡 **Tip:** Leave fields empty to use values from `.env` file")
     
     with gr.Row():
         host_input = gr.Textbox(
             label="Databricks Workspace URL", 
-            placeholder="https://your-workspace.cloud.databricks.com"
+            placeholder="https://your-workspace.cloud.databricks.com (or leave empty for .env)",
+            value=os.getenv("url", "")
         )
         token_input = gr.Textbox(
             label="Token", 
             type="password", 
-            placeholder="Enter your access token"
+            placeholder="Enter your access token (or leave empty for .env)",
+            value=os.getenv("token", "")
         )
     
     list_btn = gr.Button("List Compute Resources")

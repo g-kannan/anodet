@@ -3,3 +3,4 @@ streamlit
 duckdb
 gradio
 gradio[mcp]
+python-dotenv
