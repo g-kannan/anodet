@@ -2,12 +2,37 @@ import gradio as gr
 from databricks.sdk import WorkspaceClient
 import json
 import os
+from typing import Tuple, List, Any
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-def list_compute_resources(host_url, token, threshold_mins):
+
+def list_compute_resources(
+    host_url: str, token: str, threshold_mins: float
+) -> Tuple[List[List[Any]], List[List[Any]], List[List[Any]], str]:
+    """
+    List all compute resources (clusters and SQL warehouses) from a Databricks workspace.
+    
+    Retrieves clusters and SQL warehouses, generates summary statistics by state,
+    and identifies resources that exceed the auto-stop threshold.
+    
+    Args:
+        host_url: Databricks workspace URL (e.g., 'https://your-workspace.cloud.databricks.com').
+                 If empty, will use the 'url' value from .env file.
+        token: Databricks personal access token for authentication.
+              If empty, will use the 'token' value from .env file.
+        threshold_mins: Auto-stop threshold in minutes. SQL warehouses with auto-stop
+                       settings exceeding this value will be flagged in the breach table.
+    
+    Returns:
+        A tuple containing:
+        - cluster_summary: List of lists with cluster counts by state
+        - warehouse_summary: List of lists with warehouse counts by state
+        - breach_table: List of lists with resources exceeding the threshold
+        - json_result: JSON string with complete resource details
+    """
     try:
         # Use .env values if inputs are empty
         host_url = host_url or os.getenv("url", "")
@@ -164,4 +189,4 @@ with gr.Blocks() as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(mcp_server=True)
